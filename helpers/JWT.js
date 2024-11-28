@@ -5,14 +5,14 @@ module.exports = {
 
 
 
-    signAccessToken: (UserId) => {
+    signAccessToken: (UserId, userRole) => {
         return new Promise((resolve, reject) => {
-          const payload = {};
+          const payload = {UserId,role:userRole};
           const secret = process.env.ACCESSTOKENSECRET;
           console.log("Signing access token with secret:", secret); // Debug
           const options = {
             expiresIn: "15m",
-            issuer: "Francis",
+            issuer: "Abdiwahid",
             audience: String(UserId),
           };
           JWT.sign(payload, secret, options, (error, token) => {
@@ -68,20 +68,20 @@ module.exports = {
                     resolve(UserId)
             })
         })
+    },
+
+
+
+    restrict: (...allowedRoles) =>{
+        return(req, res, next)=>{
+            const userRole = req.payload.role
+
+            if(!userRole || allowedRoles.includes(userRole)){
+                return next(creatError.Forbidden('Sorry! You do not have permission to perform this action'))
+            }
+            next()
+        }
     }
-
-
-
-    // restrict: (...allowedRoles) =>{
-    //     return(req, res, next)=>{
-    //         const userRole = req.payload.role
-
-    //         if(!userRole || allowedRoles.includes(userRole)){
-    //             return next(creatError.Forbidden('Sorry! You do not have permission to perform this action'))
-    //         }
-    //         next()
-    //     }
-    // }
 
 
 
